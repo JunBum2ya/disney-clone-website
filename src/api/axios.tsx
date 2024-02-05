@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const apiKey = process.env.MOVIE_DB_API_KEY;
+const apiKey = process.env.REACT_APP_MOVIE_API_KEY;
 const language = 'ko-KR';
 
 const instance = axios.create({
