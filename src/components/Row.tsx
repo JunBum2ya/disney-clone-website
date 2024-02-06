@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useState } from 'react';
 import axios from '../api/axios';
+import '../scss/Row.scss';
 
 const Row = (props: RowProps) => {
   const { titile, url } = props;
