@@ -1,5 +1,6 @@
 import './App.scss';
 import Banner from './components/Banner';
+import Category from './components/Category';
 import Container from './components/Container';
 import NavigationBar from './components/NavigationBar';
 
@@ -8,6 +9,7 @@ function App() {
     <Container>
       <NavigationBar />
       <Banner />
+      <Category />
     </Container>
   );
 }
