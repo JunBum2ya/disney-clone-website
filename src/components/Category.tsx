@@ -1,25 +1,21 @@
 import '../scss/Category.scss';
 import disneyImage from '../images/viewers-disney.png';
 import marvelImage from '../images/viewers-marvel.png';
-import marvelVideo from '../images/viewers-marvel.png';
 import pixarImage from '../images/viewers-pixar.png';
-import pixarVideo from '../images/viewers-pixar.png';
 import starwarsImage from '../images/viewers-starwars.png';
-import starwarsVideo from '../images/viewers-starwars.png';
 import nationalImage from '../images/viewers-national.png';
-import nationalVideo from '../images/viewers-national.png';
 
 const Category = () => {
   return (
     <div className="category">
+      <Wrapper imagePath={disneyImage} videoPath="/videos/disney.mp4" />
+      <Wrapper imagePath={marvelImage} videoPath="/videos/marvel.mp4" />
+      <Wrapper imagePath={pixarImage} videoPath="/videos/pixar.mp4" />
+      <Wrapper imagePath={starwarsImage} videoPath="/videos/star-wars.mp4" />
       <Wrapper
-        imagePath={disneyImage}
-        videoPath="/static/media/videos/disney.mp4"
+        imagePath={nationalImage}
+        videoPath="/videos/national-geographic.mp4"
       />
-      <Wrapper imagePath={marvelImage} videoPath={marvelVideo} />
-      <Wrapper imagePath={pixarImage} videoPath={pixarVideo} />
-      <Wrapper imagePath={starwarsImage} videoPath={starwarsVideo} />
-      <Wrapper imagePath={nationalImage} videoPath={nationalVideo} />
     </div>
   );
 };
