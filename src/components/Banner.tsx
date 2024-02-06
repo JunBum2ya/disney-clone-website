@@ -16,7 +16,6 @@ const Banner = () => {
   }, []);
 
   const fetchData = async () => {
-    console.log('fetch');
     const response = await axios.get(requests.fetchNowPlaying);
     const movieId =
       response.data.results[

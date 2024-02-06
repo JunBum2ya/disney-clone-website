@@ -1,14 +1,45 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import axios from '../api/axios';
 import '../scss/Row.scss';
+import { MovieData, MoviePageInfo } from '../format/interface';
+import { Genre, genreRequest, requests } from '../api/requests';
+
+const baseUrl = 'https://image.tmdb.org/t/p/original';
+
+const RowGroup = () => {
+  const [movie, setMovie] = useState<MovieData | null>(null);
+  const [show, setShow] = useState<boolean>(false);
+  const categoryList: { title: string; code: string; url: string }[] = [
+    { title: 'Trending Now', code: 'TN', url: requests.fetchTrending },
+    { title: 'Top Rated', code: 'TR', url: requests.fetchTopRated },
+    { title: 'Action Movie', code: 'AM', url: genreRequest(Genre.ACTION) },
+    { title: 'Comedy Movie', code: 'CM', url: genreRequest(Genre.COMEDY) },
+    { title: 'Horror Movie', code: 'HR', url: genreRequest(Genre.HORROR) },
+  ];
+
+  return (
+    <>
+      {categoryList.map((category) => (
+        <Row
+          title={category.title}
+          code={category.code}
+          url={category.url}
+          setMovie={setMovie}
+          setShow={setShow}
+        />
+      ))}
+      <MovieModal movie={movie} isShow={show} setShow={setShow} />
+    </>
+  );
+};
 
 const Row = (props: RowProps) => {
-  const { titile, url } = props;
-  const [movies, setMovies] = useState<any[]>([]);
+  const { title, url } = props;
+  const [movies, setMovies] = useState<MovieData[]>([]);
 
   const fetchMovieData = useCallback(
     async (url: string) => {
-      const response = await axios.get(url);
+      const response = await axios.get<MoviePageInfo>(url);
       setMovies(response.data.results);
       return response;
     },
@@ -21,9 +52,14 @@ const Row = (props: RowProps) => {
     fetchMovieData(props.url);
   }, [fetchMovieData]);
 
+  const handleClick = (param: MovieData) => {
+    props.setMovie((movie) => param);
+    props.setShow((show) => true);
+  };
+
   return (
     <div className="row">
-      <h2>{titile}</h2>
+      <h2>{title}</h2>
       <div className="slider">
         <div
           className="slider__arrow-left"
@@ -40,8 +76,9 @@ const Row = (props: RowProps) => {
             <img
               key={movie.id}
               className="row__poster"
-              src={`https://image.tmdb.org/t/p/original/${movie.backdrop_path}`}
-              alt={movie.name}
+              src={`${baseUrl}/${movie.backdrop_path}`}
+              alt={movie.title}
+              onClick={() => handleClick(movie)}
             />
           ))}
         </div>
@@ -61,9 +98,51 @@ const Row = (props: RowProps) => {
 };
 
 interface RowProps {
-  titile: string;
+  title: string;
   code: string;
   url: string;
+  setMovie: React.Dispatch<React.SetStateAction<MovieData | null>>;
+  setShow: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
-export default Row;
+const MovieModal = (props: MovieModalProps) => {
+  const { movie, isShow, setShow } = props;
+  return (
+    <div className={`presentation${isShow ? ' show' : ''}`} role="presentation">
+      <div className="wrapper-modal">
+        <div className="modal">
+          <span
+            onClick={() => {
+              setShow((show) => false);
+            }}
+            className="modal-close"
+          >
+            X
+          </span>
+          <img
+            className="modal__poster-img"
+            src={`${baseUrl}/${movie?.backdrop_path}`}
+            alt={movie?.title}
+          />
+          <div className="modal__content">
+            <p className="modal__details">
+              <span className="modal__user-perc">100% for you</span>{' '}
+              {movie?.relase_date}
+            </p>
+            <h2 className="modal__title">{movie?.title}</h2>
+            <p className="modal__overview">평점: {movie?.vote_average}</p>
+            <p className="modal__overview">{movie?.overview}</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+interface MovieModalProps {
+  movie: MovieData | null;
+  isShow: boolean;
+  setShow: React.Dispatch<React.SetStateAction<boolean>>;
+}
+
+export default RowGroup;
