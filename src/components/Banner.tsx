@@ -3,9 +3,10 @@ import YouTube from 'react-youtube';
 import { ReactNode, useEffect, useState } from 'react';
 import { requests } from '../api/requests';
 import '../scss/Banner.scss';
+import { MovieDetail, MoviePageInfo } from '../format/interface';
 
 const Banner = () => {
-  const [movie, setMovie] = useState<any>([]);
+  const [movie, setMovie] = useState<MovieDetail | null>(null);
   const [isClicked, setIsClicked] = useState(false);
   const changeBanner = () => {
     setIsClicked((clicked) => !clicked);
@@ -16,14 +17,17 @@ const Banner = () => {
   }, []);
 
   const fetchData = async () => {
-    const response = await axios.get(requests.fetchNowPlaying);
+    const response = await axios.get<MoviePageInfo>(requests.fetchNowPlaying);
     const movieId =
       response.data.results[
         Math.floor(Math.random() * response.data.results.length)
       ].id;
-    const { data: movieDetail } = await axios.get(`movie/${movieId}`, {
-      params: { append_to_response: 'videos' },
-    });
+    const { data: movieDetail } = await axios.get<MovieDetail>(
+      `movie/${movieId}`,
+      {
+        params: { append_to_response: 'videos' },
+      }
+    );
     setMovie(movieDetail);
   };
 
@@ -40,7 +44,7 @@ const VideoBanner = (props: BannerProps) => {
     <div className="banner__container">
       <div className="home-container">
         <YoutubeIFrame
-          videoId={movie.videos.results[0].key}
+          videoId={movie?.videos.results[0].key ?? ''}
           classList={['youtube-banner']}
         />
         <button onClick={changeBannerFunction}>X</button>
@@ -55,11 +59,11 @@ const ImageBanner = (props: BannerProps) => {
     <header
       className="banner"
       style={{
-        backgroundImage: `url("https://image.tmdb.org/t/p/original/${movie.backdrop_path}")`,
+        backgroundImage: `url("https://image.tmdb.org/t/p/original/${movie?.backdrop_path}")`,
       }}
     >
       <div className="banner__contents">
-        <h1 className="banner__title">{movie.title || movie.original_title}</h1>
+        <h1 className="banner__title">{movie?.original_title}</h1>
         <div className="banner__buttons">
           {movie?.videos?.results[0]?.key && (
             <button
@@ -70,7 +74,7 @@ const ImageBanner = (props: BannerProps) => {
             </button>
           )}
         </div>
-        <p className="banner__description">{truncate(movie.overview, 100)}</p>
+        <p className="banner__description">{truncate(movie?.overview, 100)}</p>
       </div>
       <div className="banner--fadeBottom"></div>
     </header>
@@ -78,7 +82,7 @@ const ImageBanner = (props: BannerProps) => {
 };
 
 interface BannerProps {
-  movie: any;
+  movie: MovieDetail | null;
   changeBannerFunction: () => void;
 }
 
