@@ -1,20 +1,54 @@
 export interface MovieDetail {
   adult: boolean;
-  backdrop_path: string;
+  backdrop_path?: string;
   belongs_to_collection: string | null;
   budget: number;
-  genres: genre[];
+  genres: { id: number; name: string }[];
   hompage: string;
   id: number;
   imdb_id: string;
   original_language: string;
   original_title: string;
   popularity: number;
-}
-
-interface genre {
-  id: number;
-  name: string;
+  overview: string;
+  poster_path: string;
+  production_companies: {
+    id: number;
+    logo_path: string;
+    name: string;
+    origin_country: string;
+  }[];
+  production_coutries: {
+    iso_3166_1: string;
+    name: string;
+  }[];
+  relese_date: string;
+  revenue: number;
+  runtime: number;
+  spoken_languages: {
+    english_name: string;
+    iso_639_1: string;
+    name: string;
+  }[];
+  status: string;
+  tagline: string;
+  video: boolean;
+  videos: {
+    results: {
+      id: string;
+      iso_639_1: string;
+      iso_3166_1: string;
+      key: string;
+      name: string;
+      official: boolean;
+      publish_at: string;
+      site: string;
+      size: number;
+      type: string;
+    }[];
+  };
+  vote_average: number;
+  vote_count: number;
 }
 
 export interface MoviePageInfo {

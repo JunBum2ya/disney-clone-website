@@ -19,8 +19,9 @@ const RowGroup = () => {
 
   return (
     <>
-      {categoryList.map((category) => (
+      {categoryList.map((category, index) => (
         <Row
+          key={index}
           title={category.title}
           code={category.code}
           url={category.url}
