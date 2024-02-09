@@ -151,3 +151,24 @@
     }
   }
 }
+
+@media screen and (max-height: 768px) {
+  .wrapper-modal {
+    align-items: unset;
+    padding-top: 2rem;
+  }
+  .modal {
+    overflow-y: scroll;
+  }
+}
+@media screen and (max-width: 768px) {
+  .wrapper-modal {
+    padding: 0;
+    .modal__overview {
+      font-size: 16px;
+    }
+    .modal__details {
+      font-size: 16px;
+    }
+  }
+}
