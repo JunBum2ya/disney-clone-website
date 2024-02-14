@@ -42,7 +42,7 @@ const NavigationBar = () => {
 
   return (
     <nav className={'navigation-wrapper' + (show ? ' show' : '')}>
-      <a className="logo" href="#none">
+      <a className="logo" onClick={() => navigate(`/main`)}>
         <img src={logoImage} alt="Disney Plus Logo" />
       </a>
       {pathname === '/' ? (

@@ -3,6 +3,7 @@ import axios from '../api/axios';
 import '../scss/Row.scss';
 import { MovieData, MoviePageInfo } from '../format/interface';
 import { Genre, genreRequest, requests } from '../api/requests';
+import { useOnClickOutside } from '../hooks/CustomHooks';
 
 const baseUrl = 'https://image.tmdb.org/t/p/original';
 
@@ -108,10 +109,14 @@ interface RowProps {
 
 const MovieModal = (props: MovieModalProps) => {
   const { movie, isShow, setShow } = props;
+  const modalRef = useRef<HTMLDivElement>(null);
+  useOnClickOutside(modalRef, () => {
+    setShow(false);
+  });
   return (
     <div className={`presentation${isShow ? ' show' : ''}`} role="presentation">
       <div className="wrapper-modal">
-        <div className="modal">
+        <div className="modal" ref={modalRef}>
           <span
             onClick={() => {
               setShow((show) => false);
