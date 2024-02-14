@@ -63,7 +63,9 @@ const ImageBanner = (props: BannerProps) => {
       }}
     >
       <div className="banner__contents">
-        <h1 className="banner__title">{movie?.original_title}</h1>
+        <h1 className="banner__title">
+          {movie?.title || movie?.original_title}
+        </h1>
         <div className="banner__buttons">
           {movie?.videos?.results[0]?.key && (
             <button
