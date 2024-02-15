@@ -6,6 +6,9 @@ import LoginPage from './pages/LoginPage';
 import DetailPage from './pages/DetailPage';
 import SearchPage from './pages/SearchPage';
 
+//firbase
+import app from './firebase';
+
 const Layout = () => {
   return (
     <div>
