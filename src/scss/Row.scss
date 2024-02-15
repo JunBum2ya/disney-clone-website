@@ -1,5 +1,15 @@
 .slider {
   position: relative;
+  .swiper-button-prev {
+    background-clip: content-box;
+    padding: 20px 0;
+    cursor: pointer;
+  }
+  .swiper-button-next {
+    background-clip: content-box;
+    padding: 20px 0;
+    cursor: pointer;
+  }
   .slider__arrow-left {
     background-clip: content-box;
     padding: 20px 0;
@@ -38,12 +48,6 @@
     visibility: hidden;
     &:hover {
       background: rgba(20, 20, 20, 0.5);
-    }
-  }
-  .arrow {
-    transition: 400ms all ease-in-out;
-    &:hover {
-      transform: scale(1.5);
     }
   }
   .row__posters {

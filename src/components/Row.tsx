@@ -6,6 +6,7 @@ import { Genre, genreRequest, requests } from '../api/requests';
 import { useOnClickOutside } from '../hooks/CustomHooks';
 
 import { Swiper, SwiperSlide } from 'swiper/react';
+import { Navigation } from 'swiper/modules';
 import 'swiper/swiper-bundle.css'; // Swiper 스타일 import
 
 const baseUrl = 'https://image.tmdb.org/t/p/original';
@@ -70,7 +71,7 @@ const Row = (props: RowProps) => {
           className="row__posters"
           loop={true}
           spaceBetween={10}
-          slidesPerView={5}
+          modules={[Navigation]}
           breakpoints={{
             1378: {
               slidesPerView: 6,
@@ -89,6 +90,7 @@ const Row = (props: RowProps) => {
               slidesPerGroup: 3,
             },
           }}
+          navigation
         >
           {movies.map((movie, index) => (
             <SwiperSlide key={index} className="row__poster">
