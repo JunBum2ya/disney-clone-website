@@ -5,6 +5,10 @@ import { MovieData, MoviePageInfo } from '../format/interface';
 import { Genre, genreRequest, requests } from '../api/requests';
 import { useOnClickOutside } from '../hooks/CustomHooks';
 
+import { Swiper, SwiperSlide } from 'swiper/react';
+import { Navigation } from 'swiper/modules';
+import 'swiper/swiper-bundle.css'; // Swiper 스타일 import
+
 const baseUrl = 'https://image.tmdb.org/t/p/original';
 
 const RowGroup = () => {
@@ -63,37 +67,41 @@ const Row = (props: RowProps) => {
     <div className="row">
       <h2>{title}</h2>
       <div className="slider">
-        <div
-          className="slider__arrow-left"
-          onClick={() => {
-            if (postersRef.current) {
-              postersRef.current.scrollLeft -= window.innerWidth - 80;
-            }
+        <Swiper
+          className="row__posters"
+          loop={true}
+          spaceBetween={10}
+          modules={[Navigation]}
+          breakpoints={{
+            1378: {
+              slidesPerView: 6,
+              slidesPerGroup: 6,
+            },
+            998: {
+              slidesPerView: 5,
+              slidesPerGroup: 5,
+            },
+            625: {
+              slidesPerView: 4,
+              slidesPerGroup: 4,
+            },
+            0: {
+              slidesPerView: 3,
+              slidesPerGroup: 3,
+            },
           }}
+          navigation
         >
-          <span className="arrow">{'<'}</span>
-        </div>
-        <div className="row__posters" ref={postersRef}>
-          {movies.map((movie) => (
-            <img
-              key={movie.id}
-              className="row__poster"
-              src={`${baseUrl}/${movie.backdrop_path}`}
-              alt={movie.title}
-              onClick={() => handleClick(movie)}
-            />
+          {movies.map((movie, index) => (
+            <SwiperSlide key={index} className="row__poster">
+              <img
+                src={`${baseUrl}/${movie.backdrop_path}`}
+                alt={movie.title}
+                onClick={() => handleClick(movie)}
+              />
+            </SwiperSlide>
           ))}
-        </div>
-        <div
-          className="slider__arrow-right"
-          onClick={() => {
-            if (postersRef.current) {
-              postersRef.current.scrollLeft += window.innerWidth - 80;
-            }
-          }}
-        >
-          <span className="arrow">{'>'}</span>
-        </div>
+        </Swiper>
       </div>
     </div>
   );
