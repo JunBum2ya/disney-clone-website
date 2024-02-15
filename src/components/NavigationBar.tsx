@@ -1,5 +1,6 @@
 import {
   ChangeEvent,
+  MouseEventHandler,
   RefObject,
   useCallback,
   useEffect,
@@ -10,6 +11,10 @@ import logoImage from '../images/logo.svg';
 import '../scss/NavigationBar.scss';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useQuery } from '../hooks/CustomHooks';
+import { GoogleAuthProvider, getAuth, signInWithPopup } from 'firebase/auth';
+import { error } from 'console';
+import { initializeApp } from 'firebase/app';
+import app from '../firebase';
 
 const NavigationBar = () => {
   const searchTerm = useQuery();
@@ -18,6 +23,9 @@ const NavigationBar = () => {
   const navigate = useNavigate();
   const inputRef = useRef<HTMLInputElement>(null);
 
+  const auth = getAuth(app);
+  const provider = new GoogleAuthProvider();
+
   const handleScroll = useCallback(() => {
     if (window.scrollY > 50) {
       handleShow(true);
@@ -25,6 +33,14 @@ const NavigationBar = () => {
       handleShow(false);
     }
   }, []);
+
+  const handleAuth = () => {
+    signInWithPopup(auth, provider)
+      .then((result) => {
+        navigate('/main');
+      })
+      .catch((error) => console.error(error));
+  };
 
   const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
     navigate(`../search?q=${e.target.value}`);
@@ -46,7 +62,7 @@ const NavigationBar = () => {
         <img src={logoImage} alt="Disney Plus Logo" />
       </a>
       {pathname === '/' ? (
-        <Login />
+        <Login onClick={handleAuth} />
       ) : (
         <Input
           ref={inputRef}
@@ -58,9 +74,17 @@ const NavigationBar = () => {
   );
 };
 
-const Login = () => {
-  return <a className="login">로그인</a>;
+const Login = (props: LoginProps) => {
+  return (
+    <a className="login" onClick={props.onClick}>
+      로그인
+    </a>
+  );
 };
+
+interface LoginProps {
+  onClick: MouseEventHandler<HTMLAnchorElement>;
+}
 
 const Input = (props: InputProps) => {
   const { ref, value, onChange } = props;
