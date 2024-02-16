@@ -11,14 +11,20 @@ import logoImage from '../images/logo.svg';
 import '../scss/NavigationBar.scss';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useQuery } from '../hooks/CustomHooks';
-import { GoogleAuthProvider, getAuth, signInWithPopup } from 'firebase/auth';
-import { error } from 'console';
-import { initializeApp } from 'firebase/app';
+import {
+  GoogleAuthProvider,
+  User,
+  getAuth,
+  onAuthStateChanged,
+  signInWithPopup,
+  signOut,
+} from 'firebase/auth';
 import app from '../firebase';
 
 const NavigationBar = () => {
   const searchTerm = useQuery();
   const [show, setShow] = useState<boolean>(false);
+  const [userData, setUserData] = useState<User>();
   const { pathname } = useLocation();
   const navigate = useNavigate();
   const inputRef = useRef<HTMLInputElement>(null);
@@ -37,7 +43,8 @@ const NavigationBar = () => {
   const handleAuth = () => {
     signInWithPopup(auth, provider)
       .then((result) => {
-        navigate('/main');
+        setUserData(result.user);
+        localStorage.setItem('userData', JSON.stringify(userData));
       })
       .catch((error) => console.error(error));
   };
@@ -52,8 +59,30 @@ const NavigationBar = () => {
       window.removeEventListener('scroll', handleScroll);
     };
   }, [handleScroll]);
+
+  useEffect(() => {
+    onAuthStateChanged(auth, (user) => {
+      if (user) {
+        if (pathname === '/') {
+          navigate('/main');
+        }
+      } else {
+        navigate('/');
+      }
+    });
+  }, [auth, navigate, pathname]);
+
   const handleShow = (status: boolean) => {
     setShow(() => status);
+  };
+
+  const handleSignOut = () => {
+    signOut(auth)
+      .then(() => {
+        setUserData(undefined);
+        localStorage.setItem('userData', JSON.stringify({}));
+      })
+      .catch((error) => console.error(error));
   };
 
   return (
@@ -64,11 +93,31 @@ const NavigationBar = () => {
       {pathname === '/' ? (
         <Login onClick={handleAuth} />
       ) : (
-        <Input
-          ref={inputRef}
-          value={searchTerm.get('q') ?? ''}
-          onChange={handleChange}
-        />
+        <>
+          <Input
+            ref={inputRef}
+            value={searchTerm.get('q') ?? ''}
+            onChange={handleChange}
+          />
+          <div className="sign-out">
+            <img
+              className="user-img"
+              src={
+                userData?.photoURL ??
+                JSON.parse(localStorage.getItem('userData') ?? '{}')['photoURL']
+              }
+              alt={
+                userData?.displayName ??
+                JSON.parse(localStorage.getItem('userData') ?? '{}')[
+                  'displayName'
+                ]
+              }
+            />
+            <div className="drop-down">
+              <span onClick={handleSignOut}>Sign Out</span>
+            </div>
+          </div>
+        </>
       )}
     </nav>
   );
