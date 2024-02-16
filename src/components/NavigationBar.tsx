@@ -1,5 +1,6 @@
 import {
   ChangeEvent,
+  MouseEventHandler,
   RefObject,
   useCallback,
   useEffect,
@@ -10,13 +11,26 @@ import logoImage from '../images/logo.svg';
 import '../scss/NavigationBar.scss';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useQuery } from '../hooks/CustomHooks';
+import {
+  GoogleAuthProvider,
+  User,
+  getAuth,
+  onAuthStateChanged,
+  signInWithPopup,
+  signOut,
+} from 'firebase/auth';
+import app from '../firebase';
 
 const NavigationBar = () => {
   const searchTerm = useQuery();
   const [show, setShow] = useState<boolean>(false);
+  const [userData, setUserData] = useState<User>();
   const { pathname } = useLocation();
   const navigate = useNavigate();
   const inputRef = useRef<HTMLInputElement>(null);
+
+  const auth = getAuth(app);
+  const provider = new GoogleAuthProvider();
 
   const handleScroll = useCallback(() => {
     if (window.scrollY > 50) {
@@ -25,6 +39,15 @@ const NavigationBar = () => {
       handleShow(false);
     }
   }, []);
+
+  const handleAuth = () => {
+    signInWithPopup(auth, provider)
+      .then((result) => {
+        setUserData(result.user);
+        localStorage.setItem('userData', JSON.stringify(userData));
+      })
+      .catch((error) => console.error(error));
+  };
 
   const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
     navigate(`../search?q=${e.target.value}`);
@@ -36,8 +59,30 @@ const NavigationBar = () => {
       window.removeEventListener('scroll', handleScroll);
     };
   }, [handleScroll]);
+
+  useEffect(() => {
+    onAuthStateChanged(auth, (user) => {
+      if (user) {
+        if (pathname === '/') {
+          navigate('/main');
+        }
+      } else {
+        navigate('/');
+      }
+    });
+  }, [auth, navigate, pathname]);
+
   const handleShow = (status: boolean) => {
     setShow(() => status);
+  };
+
+  const handleSignOut = () => {
+    signOut(auth)
+      .then(() => {
+        setUserData(undefined);
+        localStorage.setItem('userData', JSON.stringify({}));
+      })
+      .catch((error) => console.error(error));
   };
 
   return (
@@ -46,21 +91,49 @@ const NavigationBar = () => {
         <img src={logoImage} alt="Disney Plus Logo" />
       </a>
       {pathname === '/' ? (
-        <Login />
+        <Login onClick={handleAuth} />
       ) : (
-        <Input
-          ref={inputRef}
-          value={searchTerm.get('q') ?? ''}
-          onChange={handleChange}
-        />
+        <>
+          <Input
+            ref={inputRef}
+            value={searchTerm.get('q') ?? ''}
+            onChange={handleChange}
+          />
+          <div className="sign-out">
+            <img
+              className="user-img"
+              src={
+                userData?.photoURL ??
+                JSON.parse(localStorage.getItem('userData') ?? '{}')['photoURL']
+              }
+              alt={
+                userData?.displayName ??
+                JSON.parse(localStorage.getItem('userData') ?? '{}')[
+                  'displayName'
+                ]
+              }
+            />
+            <div className="drop-down">
+              <span onClick={handleSignOut}>Sign Out</span>
+            </div>
+          </div>
+        </>
       )}
     </nav>
   );
 };
 
-const Login = () => {
-  return <a className="login">로그인</a>;
+const Login = (props: LoginProps) => {
+  return (
+    <a className="login" onClick={props.onClick}>
+      로그인
+    </a>
+  );
 };
+
+interface LoginProps {
+  onClick: MouseEventHandler<HTMLAnchorElement>;
+}
 
 const Input = (props: InputProps) => {
   const { ref, value, onChange } = props;
